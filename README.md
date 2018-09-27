@@ -35,3 +35,26 @@ openssl pkcs8 -in certs/client_key_jane_doe.pem -outform DER -out client_key_jan
 # show certificate
 openssl x509 -in certs/client_certificate_jane_doe.pem -text -noout
 ```
+
+### Create keystore for use by client
+```
+# export client's key and cert into PKCS12 (a container for this kind of purpose)
+# you would be prompted with a password and you'd need to provide it
+openssl pkcs12 -export \
+ -in certs/client_certificate_jane_doe.pem \
+ -inkey certs/client_key_jane_doe.pem -name client -out client_jane_doe.p12
+
+# import client bundle into a new keystore
+# you will be prompted for the password you just set
+keytool -importkeystore \
+ -srckeystore client_jane_doe.p12 -srcstoretype PKCS12 \
+ -destkeystore keystore.jks -deststorepass password
+
+# import the CA bundle (just one) into the keystore
+keytool -import -noprompt \
+ -alias root -trustcacerts -file certs/root_certificate.pem -keystore keystore.jks \
+ -storepass password
+
+# inspect what's inside the keystore
+keytool -list -keystore keystore.jks -storepass password -v
+```
