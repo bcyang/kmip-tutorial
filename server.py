@@ -1,1 +1,5 @@
-__copyright__ = "Copyright 2015, Mist Systems (www.mist.com)"
+from kmip.services.server import KmipServer
+
+server = KmipServer(config_path='server.conf', log_path='./log')
+with server:
+    server.serve()
